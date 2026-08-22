@@ -12,6 +12,16 @@ OpenCode V2 plugin that discovers models from one or more llama.cpp router serve
 
 ## Install locally
 
+Clone the repository and install its production dependencies. OpenCode imports local plugin files directly and does not install their dependencies.
+
+```sh
+git clone https://github.com/MXCAKE3893/opencode-llama-cpp-adaptor.git
+cd opencode-llama-cpp-adaptor
+bun install --production
+```
+
+Then add the absolute entrypoint path to `opencode.json(c)`:
+
 ```jsonc
 {
   "plugins": [
@@ -19,6 +29,14 @@ OpenCode V2 plugin that discovers models from one or more llama.cpp router serve
   ]
 }
 ```
+
+Restart the shared service after the initial install:
+
+```sh
+opencode2 service restart
+```
+
+If Bun is unavailable, `npm install --omit=dev` can install the same runtime dependency.
 
 The default endpoints are `http://127.0.0.1:8000/v1` and `http://127.0.0.1:8001/v1`.
 
