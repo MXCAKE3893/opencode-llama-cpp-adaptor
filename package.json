@@ -1,0 +1,25 @@
+{
+  "name": "opencode-llama-cpp-adaptor",
+  "version": "0.1.0",
+  "description": "OpenCode V2 plugin for automatic llama.cpp server and model discovery",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MXCAKE3893/opencode-llama-cpp-adaptor.git"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@opencode-ai/plugin": "0.0.0-beta-17898"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.8.2"
+  }
+}
