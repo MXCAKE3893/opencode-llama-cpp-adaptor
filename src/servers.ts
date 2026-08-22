@@ -1,18 +1,5 @@
 import type { ServerOptions } from "./types"
 
-export const DEFAULT_SERVERS: ServerOptions[] = [
-  {
-    providerID: "llama-cpp-proxy",
-    name: "llama.cpp Main",
-    baseURL: "http://127.0.0.1:8000/v1",
-  },
-  {
-    providerID: "llama-cpp-small",
-    name: "llama.cpp Small",
-    baseURL: "http://127.0.0.1:8001/v1",
-  },
-]
-
 const providerPattern = /^[A-Za-z0-9._-]+$/
 
 export function normalizeBaseURL(value: string): string {
@@ -61,7 +48,7 @@ export function resolveServers(
   configured: ServerOptions[] | undefined,
   stored: string[] | undefined,
 ): ServerOptions[] {
-  const initial = configured?.length ? configured : DEFAULT_SERVERS
+  const initial = configured ?? []
   if (stored === undefined) {
     return uniqueServers(
       initial.map((server) => ({ ...server, baseURL: normalizeBaseURL(server.baseURL) })),

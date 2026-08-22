@@ -38,9 +38,9 @@ opencode2 service restart
 
 If Bun is unavailable, `npm install --omit=dev` can install the same runtime dependency.
 
-The default endpoints are `http://127.0.0.1:8000/v1` and `http://127.0.0.1:8001/v1`.
-
 Open `/model`, press `Ctrl+A`, and choose **llama.cpp**. The standard key integration currently asks for a key after the configuration form; enter `local` for an unauthenticated local server. When adding a new server, save once, reopen the form after discovery, and select its models.
+
+No server endpoints are configured by default. Add them from the **llama.cpp** integration screen or through plugin options.
 
 ## Options
 
@@ -60,9 +60,9 @@ Open `/model`, press `Ctrl+A`, and choose **llama.cpp**. The standard key integr
         },
         "servers": [
           {
-            "providerID": "llama-cpp-proxy",
-            "name": "llama.cpp Main",
-            "baseURL": "http://127.0.0.1:8000/v1"
+            "providerID": "llama-cpp-local",
+            "name": "Local llama.cpp",
+            "baseURL": "http://127.0.0.1:8080/v1"
           }
         ]
       }

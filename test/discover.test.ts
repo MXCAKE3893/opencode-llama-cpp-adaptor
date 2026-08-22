@@ -34,10 +34,10 @@ describe("llama.cpp model normalization", () => {
 
   test("falls back to normalized preset text", () => {
     const model = normalizeModel(server, {
-      id: "small",
+      id: "compact",
       can_remove: false,
       status: {
-        preset: "[small]\nctx-size = 16384\nreasoning = off\n",
+        preset: "[compact]\nctx-size = 16384\nreasoning = off\n",
       },
     })
     expect(model.context).toBe(16384)

@@ -22,4 +22,8 @@ describe("server configuration", () => {
     expect(servers).toHaveLength(1)
     expect(servers[0]?.providerID).toBe("custom")
   })
+
+  test("does not assume any default servers", () => {
+    expect(resolveServers(undefined, undefined)).toEqual([])
+  })
 })
