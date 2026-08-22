@@ -29,6 +29,14 @@ function runtimeConfiguration(credential: unknown): RuntimeConfiguration {
   if (value.type !== "key") return {}
   return {
     servers: stringArray(value.configuration?.servers),
+    newServerURL:
+      typeof value.configuration?.newServerURL === "string"
+        ? value.configuration.newServerURL
+        : undefined,
+    newServerID:
+      typeof value.configuration?.newServerID === "string"
+        ? value.configuration.newServerID
+        : undefined,
     enabledModels: stringArray(value.configuration?.enabledModels),
   }
 }
@@ -64,16 +72,30 @@ export default Plugin.define({
             {
               key: "servers",
               type: "multiselect",
-              title: "llama.cpp servers",
-              description: "Select a server or add provider-id=http://host:port/v1",
-              custom: true,
-              required: true,
+              title: "Enabled llama.cpp servers",
+              description: "Select servers that were added previously",
+              custom: false,
               options: servers.map((server) => ({
                 value: encodeServer(server),
                 label: server.name ?? server.providerID,
                 description: server.baseURL,
               })),
               default: servers.map(encodeServer),
+            },
+            {
+              key: "newServerURL",
+              type: "string",
+              format: "uri",
+              title: "Add server: OpenAI-compatible base URL",
+              description: "Enter the llama.cpp endpoint. /v1 is added automatically when omitted.",
+              placeholder: "http://127.0.0.1:8080/v1",
+            },
+            {
+              key: "newServerID",
+              type: "string",
+              title: "Add server: Provider ID (optional)",
+              description: "A stable ID shown in model references. Leave blank to generate one from the URL.",
+              placeholder: "llama-cpp-local",
             },
             {
               key: "enabledModels",
@@ -131,7 +153,12 @@ export default Plugin.define({
           ? await ctx.integration.connection.resolve(connection)
           : undefined
         const nextConfiguration = runtimeConfiguration(credential)
-        const nextServers = resolveServers(options.servers, nextConfiguration.servers)
+        const nextServers = resolveServers(
+          options.servers,
+          nextConfiguration.servers,
+          nextConfiguration.newServerURL,
+          nextConfiguration.newServerID,
+        )
 
         const settled = await Promise.allSettled(
           nextServers.map((server) => discoverServer(server, options.filter, timeout)),

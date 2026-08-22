@@ -47,9 +47,11 @@ export function parseServer(value: string): ServerOptions {
 export function resolveServers(
   configured: ServerOptions[] | undefined,
   stored: string[] | undefined,
+  newServerURL?: string,
+  newServerID?: string,
 ): ServerOptions[] {
   const initial = configured ?? []
-  if (stored === undefined) {
+  if (stored === undefined && !newServerURL) {
     return uniqueServers(
       initial.map((server) => ({ ...server, baseURL: normalizeBaseURL(server.baseURL) })),
     )
@@ -57,13 +59,23 @@ export function resolveServers(
 
   const known = new Map(initial.map((server) => [server.providerID, server]))
   const parsed: ServerOptions[] = []
-  for (const value of stored) {
+  for (const value of stored ?? initial.map(encodeServer)) {
     try {
       const server = parseServer(value)
       const existing = known.get(server.providerID)
       parsed.push(existing ? { ...existing, baseURL: server.baseURL } : server)
     } catch (error) {
       console.warn(`[opencode-llama-cpp] Ignoring server '${value}':`, error)
+    }
+  }
+  if (newServerURL?.trim()) {
+    const value = newServerID?.trim()
+      ? `${newServerID.trim()}=${newServerURL.trim()}`
+      : newServerURL.trim()
+    try {
+      parsed.push(parseServer(value))
+    } catch (error) {
+      console.warn(`[opencode-llama-cpp] Ignoring new server '${value}':`, error)
     }
   }
   return uniqueServers(parsed)

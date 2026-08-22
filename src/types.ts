@@ -59,5 +59,7 @@ export interface DiscoveryResult {
 
 export interface RuntimeConfiguration {
   servers?: string[]
+  newServerURL?: string
+  newServerID?: string
   enabledModels?: string[]
 }

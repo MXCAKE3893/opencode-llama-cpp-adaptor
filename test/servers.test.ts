@@ -26,4 +26,14 @@ describe("server configuration", () => {
   test("does not assume any default servers", () => {
     expect(resolveServers(undefined, undefined)).toEqual([])
   })
+
+  test("adds a server from explicit form fields", () => {
+    expect(resolveServers(undefined, undefined, "http://localhost:8080", "local")).toEqual([
+      {
+        providerID: "local",
+        name: "llama.cpp (localhost:8080)",
+        baseURL: "http://localhost:8080/v1",
+      },
+    ])
+  })
 })

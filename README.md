@@ -38,7 +38,7 @@ opencode2 service restart
 
 If Bun is unavailable, `npm install --omit=dev` can install the same runtime dependency.
 
-Open `/model`, press `Ctrl+A`, and choose **llama.cpp**. The standard key integration currently asks for a key after the configuration form; enter `local` for an unauthenticated local server. When adding a new server, save once, reopen the form after discovery, and select its models.
+Open `/model`, press `Ctrl+A`, and choose **llama.cpp**. Enter the server URL in **Add server: OpenAI-compatible base URL** and optionally choose a stable provider ID. The standard key integration currently asks for a key after the configuration form; enter `local` for an unauthenticated local server. Save once, reopen the form after discovery, and select its models.
 
 No server endpoints are configured by default. Add them from the **llama.cpp** integration screen or through plugin options.
 
