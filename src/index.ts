@@ -70,19 +70,6 @@ export default Plugin.define({
           label: "Configure servers and models",
           form: [
             {
-              key: "servers",
-              type: "multiselect",
-              title: "Enabled llama.cpp servers",
-              description: "Select servers that were added previously",
-              custom: false,
-              options: servers.map((server) => ({
-                value: encodeServer(server),
-                label: server.name ?? server.providerID,
-                description: server.baseURL,
-              })),
-              default: servers.map(encodeServer),
-            },
-            {
               key: "newServerURL",
               type: "string",
               format: "uri",
@@ -97,22 +84,39 @@ export default Plugin.define({
               description: "A stable ID shown in model references. Leave blank to generate one from the URL.",
               placeholder: "llama-cpp-local",
             },
-            {
-              key: "enabledModels",
-              type: "multiselect",
-              title: "Models shown in /model",
-              description: "Save new servers, then reopen this form to select their models",
-              custom: false,
-              options: models.map((model) => ({
-                value: `${model.providerID}/${model.id}`,
-                label: model.name,
-                description: `${model.providerName} | ${model.context.toLocaleString()} context | ${model.status}`,
-              })),
-              default:
-                configuration.enabledModels === undefined
-                  ? models.map((model) => `${model.providerID}/${model.id}`)
-                  : configuration.enabledModels,
-            },
+            ...(servers.length
+              ? [{
+                key: "servers" as const,
+                type: "multiselect" as const,
+                title: "Enabled llama.cpp servers",
+                description: "Select servers that were added previously",
+                custom: false,
+                options: servers.map((server) => ({
+                  value: encodeServer(server),
+                  label: server.name ?? server.providerID,
+                  description: server.baseURL,
+                })),
+                default: servers.map(encodeServer),
+              }]
+              : []),
+            ...(models.length
+              ? [{
+                key: "enabledModels" as const,
+                type: "multiselect" as const,
+                title: "Models shown in /model",
+                description: "Select the discovered models to expose in /model",
+                custom: false,
+                options: models.map((model) => ({
+                  value: `${model.providerID}/${model.id}`,
+                  label: model.name,
+                  description: `${model.providerName} | ${model.context.toLocaleString()} context | ${model.status}`,
+                })),
+                default:
+                  configuration.enabledModels === undefined
+                    ? models.map((model) => `${model.providerID}/${model.id}`)
+                    : configuration.enabledModels,
+              }]
+              : []),
           ],
         },
       })
@@ -196,8 +200,25 @@ export default Plugin.define({
     }
 
     await refresh()
+    const controller = new AbortController()
+    const eventTask = (async () => {
+      for await (const event of ctx.event.subscribe({ signal: controller.signal })) {
+        if (
+          event.type === "integration.connection.updated" &&
+          event.data.integrationID === INTEGRATION_ID
+        ) {
+          await refresh()
+        }
+      }
+    })().catch((error) => {
+      if (!controller.signal.aborted) console.error(error)
+    })
     const timer = setInterval(() => void refresh().catch(console.error), interval)
-    return () => clearInterval(timer)
+    return async () => {
+      clearInterval(timer)
+      controller.abort()
+      await eventTask
+    }
   },
 })
 
